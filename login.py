@@ -4,14 +4,15 @@ import requests
 from pyquery import PyQuery as pq
 import re
 import time
-AREA = [str(i) for i in range(1,10)]
+
+AREA = [str(i) for i in range(1, 10)]
 headers = {
-    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'
 }
 
-def login_post(userid,userpassword):
-    try:
 
+def login_post(userid, userpassword, area, house):
+    try:
         s = requests.session()
         r = s.get('http://dcard.zjhu.edu.cn/Zytk32Portal/')
         doc = pq(r.text)
@@ -48,22 +49,10 @@ def login_post(userid,userpassword):
         MyMoney = doc.find('#lblOne0').text()
         if len(MyMoney)==0:
             a = 1/0
-        print('当前余额为：%s' % MyMoney)
-        return s, userpassword, MyMoney
-    except:
-        print('error')
-
-def chongzhi(s, area, house, money ,userpassword, MyMoney):
-    try:
+        # print('当前余额为：%s' % MyMoney)
         # area = input('哪栋:  ')
         if area in AREA:
             area = '0'+ area
-        # house = input('哪间寝室:  ')
-        # money = input('给你寝室整多少的:  ')
-        are_you_sure()
-        if eval(money) > eval(MyMoney[1:]):
-            print('心里还有点数吗,就剩 %s,这么不买个飞机.' % (MyMoney))
-            return None
         r_post = s.get('http://dcard.zjhu.edu.cn/Zytk32Portal/Cardholder/SelfHelp.aspx', headers=headers)
         doc = pq(r_post.text)
         value_1 = doc.find('#__VIEWSTATE').attr('value')
@@ -153,6 +142,20 @@ def chongzhi(s, area, house, money ,userpassword, MyMoney):
         value_2 = doc.find('#__EVENTVALIDATION').attr('value')
         Electric = doc.find('#lblItem').text()
         Electric = re.search('缴费项目：常工用电缴费 当前剩余电量：(.*?)度', Electric)[1]
+        # print('当前剩余电量：%s度' % Electric)
+        to_Charge = {'s':s, 'userpassword':userpassword, 'MyMoney':MyMoney,'value_1':value_1,'value_2':value_2}
+        to_Views = {'surplus_ele':Electric,'MyMoney':MyMoney}
+        return to_Charge, to_Views
+    except:
+        print('失败！！！网络问题或者账号密码错误')
+        time.sleep(3)
+
+
+def Charge(s, userpassword, MyMoney, value_1, value_2, money):
+    try:
+        # if eval(money) > eval(MyMoney[1:]):
+        #     print('心里还有点数吗,就剩 %s,这么不买个飞机.' % (MyMoney))
+        #     return None
         final_data = {
             '__VIEWSTATE':value_1,
             'txtMon':money,
@@ -169,13 +172,14 @@ def chongzhi(s, area, house, money ,userpassword, MyMoney):
             yu_e = s.get('http://dcard.zjhu.edu.cn/Zytk32Portal/Cardholder/AccBalance.aspx')
             doc = pq(yu_e.text)
             MyMoney = doc.find('#lblOne0').text()
-            print('成功缴费：%s\t余额还剩：%s\t还剩%s度电' % (money, MyMoney, Electric))
+            print('成功缴费：%s\t余额还剩：%s\t' % (money, MyMoney))
             time.sleep(5)
         else:
             print('Error')
     except:
         print('失败！！！网络问题或者账号密码错误')
-        time.sleep(3)
+        return None
+        # time.sleep(3)
         # login_post(userid, userpassword, area, house)
 
 
@@ -190,25 +194,3 @@ def are_you_sure():
     elif Is in no:
         print('好的老弟, 多挣点钱养我')
         time.sleep(5)
-        return None
-
-# if __name__ == '__main__':
-#     print("作者: 99Kies")
-#     print("99Kies的博客：https://blog.csdn.net/qq_19381989")
-#     print("如有需要请在GitHub上star我的项目：https://github.com/99kies/electric_charge\n\n")
-#     userid = input('学号:  ')
-#     userpassword = input('密码:  ')
-#     login_post(userid,userpassword)
-
-if __name__ == '__main__':
-    userid = input('userid: ')
-    userpassword = input('passwd: ')
-    gg = login_post(userid, userpassword)
-    print(gg)
-    area = input('area: ')
-    house = input("house: ")
-    money = input("money: ")
-    chongzhi(gg[0], area, house, money, gg[2], gg[1])
-
-
-# def chongzhi(s, area, house, money ,userpassword, MyMoney):
