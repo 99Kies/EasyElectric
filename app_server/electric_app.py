@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, session
+from flask import Flask, render_template, flash, redirect, session, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired, Length
@@ -40,27 +40,24 @@ def index():
         passwd = form.passwd.data
         area = form.area.data
         house = form.house.data
-        msg = login_post(userid, passwd, area, house)
-        # to_Charge = msg[0]
-        # to_View = msg[1]
-        # print(to_Charge, to_View)
         global to_Charge
         global to_View
         with app.app_context():
             msg = login_post(userid, passwd, area, house)
-            to_Charge = msg[0]
-            to_View = msg[1]
-        return redirect('money')
+            if msg:
+                to_Charge = msg[0]
+                to_View = msg[1]
+            else:
+                flash("网络异常, 请尝试重新登陆", 'warning')
+                return redirect(url_for("index"))
+        return redirect(url_for('money'))
     return render_template("electric_app.html", form=form)
-
-    return
 
 
 @app.route('/money', methods=['GET','POST'])
 def money():
     global to_View
     global to_Charge
-    # print(to_Charge, to_View)
     form = CostForm()
     now_money = to_View['MyMoney']
     now_ele = to_View['surplus_ele']
@@ -69,8 +66,8 @@ def money():
         Charge(to_Charge['s'], to_Charge['userpassword'], to_Charge['MyMoney'], to_Charge['value_1'], to_Charge['value_2'], money)
         flash('成功充值 %s ' % money)
         # return redirect('done')
-    # return render_template('money.html', form=form, now_money=now_money, now_ele=now_ele)
-    return json.dumps(resu, ensure_ascii=False)
+    return render_template('money.html', form=form, now_money=now_money, now_ele=now_ele)
+    # return json.dumps(resu, ensure_ascii=False)
 @app.route('/done')
 def done():
     return '完事了'
