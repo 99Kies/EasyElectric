@@ -1,8 +1,0 @@
-{% extends 'base.html' %}
-{% from 'bootstrap/form.html' import render_form %}
-
-{% block content %}
-    <div class="hello-form">
-        {{ render_form(form, action=request.full_path, method='post') }}
-    </div>
-{% endblock %}
