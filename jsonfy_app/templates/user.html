@@ -17,12 +17,18 @@
         </h1>
     </header>
 <div class="container h-100">
-        <div class="row h-100 page-header justify-content-center align-items-center">
-            <h1>当前余额还剩 |  <span id="now_money"></span> </h1>
-            <h1>当前用电还剩 |  <span id="now_ele"></span></h1>
-        </div>
+        <!-- <div class="row h-100 page-header justify-content-center align-items-center"> -->
+            <div>
+            <strong>当前余额还剩 |  <span id="a"></span> </strong>
+            <br/> 
+            <strong>当前用电还剩 |  <span id="b"></span></strong>
+            </div>
+            <br>
+            <br>
+            
+        <!-- </div> -->
         <div class="row h-100 justify-content-center align-items-center">
-                <form action="user" method="post"            class="form col-6" role="form">
+                <form action="done" method="post"            class="form col-6" role="form">
         <input id="csrf_token" name="csrf_token" type="hidden" value="ImRjODY0N2ZmN2NhNDlkNzhhOTc0ZjVjMTQwODNjNTc1M2ZlNDQ1MWYi.XjFtzA.8TyN4VyVk6PLnub2DtmiDDrDj38">
 
 
@@ -36,7 +42,7 @@
             <input class="btn btn-secondary" id="submit" name="submit" type="submit" value="冲！">
 
 
-    </form>
+                </form>
         </div>
     </div>
     <footer class="text-center">
@@ -51,9 +57,10 @@
 <script type="text/javascript" src="../static/js/popper.min.js"></script>
 <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="../static/js/script.js"></script>
+<script src="../static/js/jquery.js"></script>
 <script>
     $(function () {
-        $.getJSON('/user', function (res) {
+        $.getJSON('/money', function (res) {
             for(let key in res) {
                 $('#'+key).text(res[key]);
             }
