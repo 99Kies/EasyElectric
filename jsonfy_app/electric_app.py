@@ -3,6 +3,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, PasswordField, Form
 from wtforms.validators import DataRequired, Length
 
+import requests
+
 import os
 import json
 
@@ -28,144 +30,55 @@ class CostForm(Form):
     money = StringField("充值", validators=[DataRequired(), Length(1,20)])
     submit = SubmitField("冲！")
 
-
-# @app.route('/user', methods=['GET', 'POST'])
-# def user():
-#     # form = LoginForm()
-#     form = {}
-#     form['userid'] = request.values.get('userid')
-#     form['passwd'] = request.values.get('passwd')
-#     form['house'] = request.values.get('house')
-#     form['submit'] = request.values.get('submit')
-#     if form.get('submit') :
-#         return str(form)
-#     return 'hello'
-
-# @app.route('/user', methods=['GET', 'POST'])
-# def user():
-#     form = LoginForm(request.form)
-#     print(form.userid.data)
-#     if form.validate():
-#         return form.userid.data
-#     return 'hello'
-
-
-# @app.route('/user', methods=['GET','POST'])
-# def user():
-#     form = LoginForm(request.form)
-#     if form.validate():
-#         userid = form.userid.data
-#         passwd = form.passwd.data
-#         area = form.area.data
-#         house = form.house.data
-#         print(userid)
-#         print(passwd)
-#         global to_Charge
-#         global to_View
-#         with app.app_context():
-#             msg = login_post(userid, passwd, area, house)
-#             if msg:
-#                 to_Charge = msg[0]
-#                 to_View = msg[1]
-#             else:
-#                 # flash("网络异常, 请尝试重新登陆", 'warning')
-#                 return redirect(url_for("index"))
-#         return redirect(url_for('money'))
-#     return str([userid, passwd, area, house])
-
-
 @app.route('/', methods=['GET','POST'])
 def index():
     return render_template('index.html')
-
-# @app.route('/user', methods=['GET','POST'])
-# def user():
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         userid = form.userid.data
-#         passwd = form.passwd.data
-#         area = form.area.data
-#         house = form.house.data
-#         print(userid)
-#         print(passwd)
-#         global to_Charge
-#         global to_View
-#         with app.app_context():
-#             msg = login_post(userid, passwd, area, house)
-#             if msg:
-#                 to_Charge = msg[0]
-#                 to_View = msg[1]
-#             else:
-#                 # flash("网络异常, 请尝试重新登陆", 'warning')
-#                 return redirect(url_for("index"))
-#         return redirect(url_for('money'))
-#     return 'hello'
-
 
 
 @app.route('/user', methods=['GET','POST'])
 def user():
     form = LoginForm(request.form)
     if form.validate():
-        userid = form.userid.data
-        passwd = form.passwd.data
-        area = form.area.data
-        house = form.house.data
-        print(userid)
-        print(passwd)
-        # global to_Charge
-        # global to_Views
-        # with app.app_context():
-            # msg = login_post(userid, passwd, area, house)
+        # userid = form.userid.data
+        # passwd = form.passwd.data
+        # area = form.area.data
+        # house = form.house.data
+        current_app.config['userid'] = form.userid.data
+        current_app.config['passwd'] = form.passwd.data
+        current_app.config['area'] = form.area.data
+        current_app.config['house'] = form.house.data
         msg = [{'a':'1','b':'2','c':'3'}, {'a':'1','b':'2','c':'3'}]
+       
         # msg = login_post(userid, passwd, area, house)
+        # msg = login_post(current_app.config['userid'], current_app.config['passwd'], current_app.config['passwd'], current_app.config['area'], current_app.config['house'])
         if msg:
             current_app.config['to_Charge'] = msg[0]
             current_app.config['to_View'] = msg[1]
         else:
         #     # flash("网络异常, 请尝试重新登陆", 'warning')
             return redirect(url_for("index"))
-        # # return redirect(url_for('money'))
-        # # print(current_app.config)
-        print(type(current_app.config['to_Charge']))
-        return jsonify(msg)
-    return jsonify({'code':form.errors})
-
-
-
-@app.route('/money', methods=['GET','POST'])
-def money():
-    form = CostForm(request.form)
-    if form.validate():
-        money = form.money.data
-        to_Charge = current_app.config['to_Charge']
-        # Charge(to_Charge['s'], to_Charge['userpassword'], to_Charge['MyMoney'], to_Charge['value_1'], to_Charge['value_2'], money)
-        print(to_Charge)
-        
-        return '完事了！'
     return render_template('user.html')
-    
 
 
-# @app.route('/money', methods=['GET','POST'])
-# def money():
-#     # global to_View
-#     # global to_Charge
-#     form = CostForm()
-#     # now_money = to_View['MyMoney']
-#     # now_ele = to_View['surplus_ele']
-#     if form.validate_on_submit():
-#         money = form.money.data
-#         Charge(to_Charge['s'], to_Charge['userpassword'], to_Charge['MyMoney'], to_Charge['value_1'], to_Charge['value_2'], money)
-#         flash('成功充值 %s ' % money)
-#         # return redirect('done')
-#     return render_template('money.html', form=form, now_money=now_money, now_ele=now_ele)
-#     # return json.dumps(resu, ensure_ascii=False)
-@app.route('/done')
+
+@app.route('/money', methods=['GET', 'POST'])
+def money():
+    return jsonify({'a':current_app.config['to_Charge']['a'], 'b':current_app.config['to_Charge']['b']})
+
+
+@app.route('/done', methods=['GET', 'POST'])
 def done():
-    return '完事了'
-
-
+    form_cost = CostForm(request.form)
+    if form_cost.validate():
+        money = form_cost.money.data
+        to_Charge = current_app.config['to_Charge']
+        print(money)
+        try:
+            # Charge(to_Charge['s'], to_Charge['userpassword'], to_Charge['MyMoney'], to_Charge['value_1'], to_Charge['value_2'], money)
+            return  money + '完事了' 
+        except:
+            return "something wrong, please try again."
+    return 'error'
 
 if __name__ == '__main__':
     app.run()
