@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-device-width, initial-scale-1, shrink-to-fit-no">
+    <title>湖师易缴费</title>
+    <link rel="icon" href="../static/favicon.ico">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../static/css/style.css" type="text/css">
+</head>
+<body>
+<main class="container">
+    <header>
+        <h1 class="text-container display-4">
+            <a href="/" class="text-success"><strong>湖师易缴费</strong></a>
+            <small style="font-size: 24px" class="text-muted">寝室充电小助手</small>
+        </h1>
+    </header>
+<div class="container h-100">
+        <div class="row h-100 page-header justify-content-center align-items-center">
+            <h1>当前余额还剩 |  <span id="now_money"></span> </h1>
+            <h1>当前用电还剩 |  <span id="now_ele"></span></h1>
+        </div>
+        <div class="row h-100 justify-content-center align-items-center">
+                <form action="user" method="post"            class="form col-6" role="form">
+        <input id="csrf_token" name="csrf_token" type="hidden" value="ImRjODY0N2ZmN2NhNDlkNzhhOTc0ZjVjMTQwODNjNTc1M2ZlNDQ1MWYi.XjFtzA.8TyN4VyVk6PLnub2DtmiDDrDj38">
+
+
+<div class="form-group required"><label class="form-control-label" for="money">充值</label>
+                        <input class="form-control" id="money" name="money" required type="test" value="">
+        </div>
+
+
+
+
+            <input class="btn btn-secondary" id="submit" name="submit" type="submit" value="冲！">
+
+
+    </form>
+        </div>
+    </div>
+    <footer class="text-center">
+            <small> &copy; 2018 <a href="https://www.csdn.net" title="Written by Grey Li">小汤六六</a> /
+                <a href="https://github.com/99kies" title="Fork me on GitHub">GitHub</a> /
+                <a href="https://www.baidu.com" title="A HelloFlask project">HelloFlask</a>
+            </small>
+            <p><a id="bottom" href="#" title="Go Top">&uarr;</a></p>
+    </footer>
+</main>
+<script type="text/javascript" src="../static/js/jquery-3.2.1.slim.min.js"></script>
+<script type="text/javascript" src="../static/js/popper.min.js"></script>
+<script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../static/js/script.js"></script>
+<script>
+    $(function () {
+        $.getJSON('/user', function (res) {
+            for(let key in res) {
+                $('#'+key).text(res[key]);
+            }
+        })
+    })
+</script>
+</body>
+</html>
+
+</body>
+</html>
